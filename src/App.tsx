@@ -4,10 +4,14 @@ import type { Cotacao } from './types/cotacao'
 import { CotacaoCard } from './components/CotacaoCard'
 import { GraficoHistorico } from './components/GraficoHistorico'
 import { TabelaCotacoes } from './components/TabelaCotacoes'
+import { AbaNoticias } from './components/AbaNoticias'
+
+type Aba = 'cotacoes' | 'noticias'
 
 export default function App() {
   const [cotacoes, setCotacoes] = useState<Cotacao[]>([])
   const [loading, setLoading] = useState(true)
+  const [aba, setAba] = useState<Aba>('cotacoes')
 
   async function buscarCotacoes() {
     const { data } = await supabase
@@ -23,21 +27,16 @@ export default function App() {
   useEffect(() => {
     buscarCotacoes()
 
-    // Realtime — escuta novos inserts na tabela cotacoes
     const channel = supabase
       .channel('cotacoes-realtime')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'cotacoes' },
-        () => {
-          buscarCotacoes()
-        }
+        () => buscarCotacoes()
       )
       .subscribe()
 
-    return () => {
-      supabase.removeChannel(channel)
-    }
+    return () => { supabase.removeChannel(channel) }
   }, [])
 
   const ultimasCotacoes = ['USD', 'EUR', 'BTC', 'ETH'].map(moeda =>
@@ -45,24 +44,49 @@ export default function App() {
   ).filter(Boolean) as Cotacao[]
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">
+    <div className="min-h-screen bg-gray-100 p-4 md:p-6">
+      <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-6">
         💰 Dashboard de Cotações
       </h1>
 
-      {loading ? (
-        <p className="text-gray-500">Carregando...</p>
-      ) : (
-        <div className="flex flex-col gap-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {ultimasCotacoes.map(c => (
-              <CotacaoCard key={c.moeda} cotacao={c} />
-            ))}
+      <div className="flex gap-2 mb-6">
+        <button
+          onClick={() => setAba('cotacoes')}
+          className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${aba === 'cotacoes'
+              ? 'bg-blue-600 text-white'
+              : 'bg-white text-gray-600 hover:bg-gray-200'
+            }`}
+        >
+          📈 Cotações
+        </button>
+        <button
+          onClick={() => setAba('noticias')}
+          className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${aba === 'noticias'
+              ? 'bg-blue-600 text-white'
+              : 'bg-white text-gray-600 hover:bg-gray-200'
+            }`}
+        >
+          📰 Notícias
+        </button>
+      </div>
+
+      {aba === 'cotacoes' && (
+        loading ? (
+          <p className="text-gray-500">Carregando...</p>
+        ) : (
+          <div className="flex flex-col gap-4 md:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              {ultimasCotacoes.map(c => (
+                <CotacaoCard key={c.moeda} cotacao={c} />
+              ))}
+            </div>
+            <GraficoHistorico cotacoes={[...cotacoes].reverse()} />
+            <TabelaCotacoes cotacoes={cotacoes} />
           </div>
-          <GraficoHistorico cotacoes={[...cotacoes].reverse()} />
-          <TabelaCotacoes cotacoes={cotacoes} />
-        </div>
+        )
       )}
+
+      {aba === 'noticias' && <AbaNoticias />}
     </div>
   )
 }
