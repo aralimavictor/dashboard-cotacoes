@@ -36,7 +36,6 @@ export function GraficoHistorico({ cotacoes }: Props) {
                 Histórico de Cotações
             </h2>
 
-            {/* Gráfico Moedas */}
             <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2">💵 Moedas (USD / EUR)</p>
                 <ResponsiveContainer width="100%" height={200}>
@@ -60,7 +59,6 @@ export function GraficoHistorico({ cotacoes }: Props) {
                 </ResponsiveContainer>
             </div>
 
-            {/* Gráfico Cripto */}
             <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2">🪙 Cripto (BTC / ETH)</p>
                 <ResponsiveContainer width="100%" height={200}>
@@ -74,8 +72,8 @@ export function GraficoHistorico({ cotacoes }: Props) {
                             }
                         />
                         <Tooltip
-                            formatter={(value: number, name: string) => [
-                                `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                            formatter={(value, name) => [
+                                `R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
                                 name
                             ]}
                         />
