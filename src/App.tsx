@@ -16,9 +16,6 @@ export default function App() {
       .order('criado_em', { ascending: false })
       .limit(50)
 
-    console.log('data:', data)
-    console.log('error:', Error)
-
     if (data) setCotacoes(data)
     setLoading(false)
   }
@@ -26,8 +23,21 @@ export default function App() {
   useEffect(() => {
     buscarCotacoes()
 
-    const intervalo = setInterval(buscarCotacoes, 30000)
-    return () => clearInterval(intervalo)
+    // Realtime — escuta novos inserts na tabela cotacoes
+    const channel = supabase
+      .channel('cotacoes-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'cotacoes' },
+        () => {
+          buscarCotacoes()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   const ultimasCotacoes = ['USD', 'EUR', 'BTC', 'ETH'].map(moeda =>
