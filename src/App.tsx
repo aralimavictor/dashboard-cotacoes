@@ -1,3 +1,4 @@
+import { useDarkMode } from './hooks/useDarkMode'
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabase'
 import type { Cotacao } from './types/cotacao'
@@ -12,6 +13,7 @@ export default function App() {
   const [cotacoes, setCotacoes] = useState<Cotacao[]>([])
   const [loading, setLoading] = useState(true)
   const [aba, setAba] = useState<Aba>('cotacoes')
+  const { dark, toggle } = useDarkMode()
 
   async function buscarCotacoes() {
     const { data } = await supabase
@@ -60,17 +62,26 @@ export default function App() {
   ).filter(Boolean) as Cotacao[]
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-6">
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-6">
-        💰 Dashboard de Cotações
-      </h1>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 md:p-6 transition-colors">
+      <div className="flex items-center justify-between mb-4 md:mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
+          💰 Dashboard de Cotações
+        </h1>
+        <button
+          onClick={toggle}
+          className="p-2 rounded-xl bg-white dark:bg-gray-800 shadow text-xl"
+          title="Alternar modo escuro"
+        >
+          {dark ? '☀️' : '🌙'}
+        </button>
+      </div>
 
       <div className="flex gap-2 mb-6">
         <button
           onClick={() => setAba('cotacoes')}
           className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${aba === 'cotacoes'
             ? 'bg-blue-600 text-white'
-            : 'bg-white text-gray-600 hover:bg-gray-200'
+            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
         >
           📈 Cotações
@@ -79,7 +90,7 @@ export default function App() {
           onClick={() => setAba('noticias')}
           className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${aba === 'noticias'
             ? 'bg-blue-600 text-white'
-            : 'bg-white text-gray-600 hover:bg-gray-200'
+            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
         >
           📰 Notícias
@@ -88,7 +99,7 @@ export default function App() {
 
       {aba === 'cotacoes' && (
         loading ? (
-          <p className="text-gray-500">Carregando...</p>
+          <p className="text-gray-500 dark:text-gray-400">Carregando...</p>
         ) : (
           <div className="flex flex-col gap-4 md:gap-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">

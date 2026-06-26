@@ -31,62 +31,61 @@ export function GraficoHistorico({ cotacoes }: Props) {
     }, [] as Record<string, any>[])
 
     return (
-        <div className="bg-white rounded-2xl shadow p-4 md:p-5">
-            <h2 className="text-base md:text-lg font-bold text-gray-700 mb-4">📈 Histórico</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 md:p-5">
+            <h2 className="text-base md:text-lg font-bold text-gray-700 dark:text-gray-200 mb-4">
+                Histórico de Cotações
+            </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Gráfico Moedas */}
+                    <div>
+                        <p className="text-xs font-semibold text-gray-500 mb-2">💵 Moedas (USD / EUR)</p>
+                        <ResponsiveContainer width="100%" height={200}>
+                            <LineChart data={dadosAgrupados}>
+                                <XAxis dataKey="hora" tick={{ fontSize: 10 }} />
+                                <YAxis
+                                    tick={{ fontSize: 10 }}
+                                    width={55}
+                                    tickFormatter={v => `R$${v.toFixed(2)}`}
+                                />
+                                <Tooltip
+                                    formatter={(value: number, name: string) => [
+                                        `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                                        name
+                                    ]}
+                                />
+                                <Legend />
+                                <Line type="monotone" dataKey="USD" stroke={CORES.USD} dot={false} strokeWidth={2} />
+                                <Line type="monotone" dataKey="EUR" stroke={CORES.EUR} dot={false} strokeWidth={2} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
 
-                {/* Gráfico Moedas */}
-                <div>
-                    <p className="text-xs font-semibold text-gray-500 mb-2">💵 Moedas (USD / EUR)</p>
-                    <ResponsiveContainer width="100%" height={200}>
-                        <LineChart data={dadosAgrupados}>
-                            <XAxis dataKey="hora" tick={{ fontSize: 10 }} />
-                            <YAxis
-                                tick={{ fontSize: 10 }}
-                                width={55}
-                                tickFormatter={v => `R$${v.toFixed(2)}`}
-                            />
-                            <Tooltip
-                                formatter={(value: number, name: string) => [
-                                    `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-                                    name
-                                ]}
-                            />
-                            <Legend />
-                            <Line type="monotone" dataKey="USD" stroke={CORES.USD} dot={false} strokeWidth={2} />
-                            <Line type="monotone" dataKey="EUR" stroke={CORES.EUR} dot={false} strokeWidth={2} />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
+                    {/* Gráfico Cripto */}
+                    <div>
+                        <p className="text-xs font-semibold text-gray-500 mb-2">🪙 Cripto (BTC / ETH)</p>
+                        <ResponsiveContainer width="100%" height={200}>
+                            <LineChart data={dadosAgrupados}>
+                                <XAxis dataKey="hora" tick={{ fontSize: 10 }} />
+                                <YAxis
+                                    tick={{ fontSize: 10 }}
+                                    width={70}
+                                    tickFormatter={v =>
+                                        v >= 1000 ? `R$${(v / 1000).toFixed(0)}k` : `R$${v.toFixed(0)}`
+                                    }
+                                />
+                                <Tooltip
+                                    formatter={(value: number, name: string) => [
+                                        `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                                        name
+                                    ]}
+                                />
+                                <Legend />
+                                <Line type="monotone" dataKey="BTC" stroke={CORES.BTC} dot={false} strokeWidth={2} />
+                                <Line type="monotone" dataKey="ETH" stroke={CORES.ETH} dot={false} strokeWidth={2} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
 
-                {/* Gráfico Cripto */}
-                <div>
-                    <p className="text-xs font-semibold text-gray-500 mb-2">🪙 Cripto (BTC / ETH)</p>
-                    <ResponsiveContainer width="100%" height={200}>
-                        <LineChart data={dadosAgrupados}>
-                            <XAxis dataKey="hora" tick={{ fontSize: 10 }} />
-                            <YAxis
-                                tick={{ fontSize: 10 }}
-                                width={70}
-                                tickFormatter={v =>
-                                    v >= 1000 ? `R$${(v / 1000).toFixed(0)}k` : `R$${v.toFixed(0)}`
-                                }
-                            />
-                            <Tooltip
-                                formatter={(value: number, name: string) => [
-                                    `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-                                    name
-                                ]}
-                            />
-                            <Legend />
-                            <Line type="monotone" dataKey="BTC" stroke={CORES.BTC} dot={false} strokeWidth={2} />
-                            <Line type="monotone" dataKey="ETH" stroke={CORES.ETH} dot={false} strokeWidth={2} />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
-
-            </div>
         </div>
     )
 }
