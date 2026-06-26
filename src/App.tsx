@@ -6,6 +6,7 @@ import { CotacaoCard } from './components/CotacaoCard'
 import { GraficoHistorico } from './components/GraficoHistorico'
 import { TabelaCotacoes } from './components/TabelaCotacoes'
 import { AbaNoticias } from './components/AbaNoticias'
+import { AnaliseIA } from './components/AnaliseIA'
 
 type Aba = 'cotacoes' | 'noticias'
 
@@ -111,6 +112,7 @@ export default function App() {
               })}
             </div>
             <GraficoHistorico cotacoes={[...cotacoes].reverse()} />
+            <AnaliseIA cotacoes={cotacoes} />
             <TabelaCotacoes cotacoes={cotacoes} />
           </div>
         )
