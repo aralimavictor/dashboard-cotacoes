@@ -39,6 +39,22 @@ export default function App() {
     return () => { supabase.removeChannel(channel) }
   }, [])
 
+  function getMaxMin(moeda: string) {
+    const hoje = new Date().toDateString()
+    const registrosDia = cotacoes.filter(c =>
+      c.moeda === moeda &&
+      new Date(c.criado_em).toDateString() === hoje
+    )
+
+    if (registrosDia.length === 0) return { max: 0, min: 0 }
+
+    const valores = registrosDia.map(c => c.valor)
+    return {
+      max: Math.max(...valores),
+      min: Math.min(...valores),
+    }
+  }
+
   const ultimasCotacoes = ['USD', 'EUR', 'BTC', 'ETH'].map(moeda =>
     cotacoes.find(c => c.moeda === moeda)
   ).filter(Boolean) as Cotacao[]
@@ -53,8 +69,8 @@ export default function App() {
         <button
           onClick={() => setAba('cotacoes')}
           className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${aba === 'cotacoes'
-              ? 'bg-blue-600 text-white'
-              : 'bg-white text-gray-600 hover:bg-gray-200'
+            ? 'bg-blue-600 text-white'
+            : 'bg-white text-gray-600 hover:bg-gray-200'
             }`}
         >
           📈 Cotações
@@ -62,8 +78,8 @@ export default function App() {
         <button
           onClick={() => setAba('noticias')}
           className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${aba === 'noticias'
-              ? 'bg-blue-600 text-white'
-              : 'bg-white text-gray-600 hover:bg-gray-200'
+            ? 'bg-blue-600 text-white'
+            : 'bg-white text-gray-600 hover:bg-gray-200'
             }`}
         >
           📰 Notícias
@@ -76,9 +92,12 @@ export default function App() {
         ) : (
           <div className="flex flex-col gap-4 md:gap-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              {ultimasCotacoes.map(c => (
-                <CotacaoCard key={c.moeda} cotacao={c} />
-              ))}
+              {ultimasCotacoes.map(c => {
+                const { max, min } = getMaxMin(c.moeda)
+                return (
+                  <CotacaoCard key={c.moeda} cotacao={c} max={max} min={min} />
+                )
+              })}
             </div>
             <GraficoHistorico cotacoes={[...cotacoes].reverse()} />
             <TabelaCotacoes cotacoes={cotacoes} />
