@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react'
 interface Noticia {
   title: string
   description: string
-  url: string
-  source: { name: string }
-  publishedAt: string
+  link: string
+  source_name: string
+  pubDate: string
 }
 
 export function AbaNoticias() {
@@ -18,10 +18,10 @@ export function AbaNoticias() {
       try {
         const key = import.meta.env.VITE_GNEWS_API_KEY
         const res = await fetch(
-          `https://gnews.io/api/v4/search?q=finanças+economia+cripto&lang=pt&country=br&max=10&apikey=${key}`
+          `https://newsdata.io/api/1/news?apikey=${key}&q=bitcoin+crypto+finance&language=en`
         )
         const data = await res.json()
-        setNoticias(data.articles ?? [])
+        setNoticias(data.results ?? [])
       } catch {
         setErro(true)
       } finally {
@@ -34,25 +34,35 @@ export function AbaNoticias() {
 
   if (loading) return <p className="text-gray-500">Carregando notícias...</p>
   if (erro) return <p className="text-red-500">Erro ao carregar notícias.</p>
+  if (noticias.length === 0) return <p className="text-gray-500">Nenhuma notícia encontrada.</p>
 
   return (
     <div className="flex flex-col gap-4">
       {noticias.map((n, i) => (
         <a
           key={i}
-          href={n.url}
+          href={n.link}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-white rounded-2xl shadow p-4 md:p-5 hover:shadow-md transition-shadow"
+          className="bg-white rounded-2xl shadow p-4 md:p-5 hover:shadow-md transition-shadow block"
         >
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-blue-500 font-semibold">{n.source.name}</span>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs bg-blue-100 text-blue-600 font-semibold px-2 py-1 rounded-full">
+              {n.source_name}
+            </span>
             <span className="text-xs text-gray-400">
-              {new Date(n.publishedAt).toLocaleString('pt-BR')}
+              {new Date(n.pubDate).toLocaleString('pt-BR')}
             </span>
           </div>
-          <h3 className="text-sm md:text-base font-bold text-gray-800 mb-1">{n.title}</h3>
-          <p className="text-xs md:text-sm text-gray-500 line-clamp-2">{n.description}</p>
+          <h3 className="text-sm md:text-base font-bold text-gray-800 mb-1 leading-snug">
+            {n.title}
+          </h3>
+          {n.description && (
+            <p className="text-xs md:text-sm text-gray-500 line-clamp-2">
+              {n.description}
+            </p>
+          )}
+          <span className="text-xs text-blue-400 mt-2 inline-block">Ler mais →</span>
         </a>
       ))}
     </div>
